@@ -78,7 +78,8 @@ def tokenize_and_label(row : dict, tokenizer : AutoTokenizer):
 
   # most transformers' tokenizers add a special character to the first sub-token of a word
   # dummy tokenization to retrieve it
-  init_special_char = tokenizer.tokenize('dummy')[0][0]
+  #init_special_char = tokenizer.tokenize('dummy')[0][0]
+  init_special_char = '##'
 
   for _, token in enumerate(tokens_context):
     # remove init character if present
