@@ -1,1 +1,1 @@
-# Legal-NER
+# LegalEval
