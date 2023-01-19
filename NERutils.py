@@ -1,4 +1,12 @@
 import re 
+from transformers import AutoTokenizer, TokenClassificationPipeline
+from datasets import Dataset, Features, Value, ClassLabel, Sequence
+import pandas as pd
+import tqdm
+from typing import Union, List, Optional
+from transformers.pipelines import AggregationStrategy
+import torch
+import numpy as np
 
 def adapt_indexes_without_spaces(row):
     """
@@ -91,7 +99,8 @@ def tokenize_and_label(row : dict, tokenizer : AutoTokenizer):
   return list(zip(tokens_context, labels))
 
 class NERDataMaker:
-    def __init__(self, df : pd.DataFrame):
+    def __init__(self, df : pd.DataFrame, tokenizer : AutoTokenizer):
+        self.tokenizer = tokenizer
         self.unique_entities = []
         self.processed_texts = []
 
@@ -99,7 +108,7 @@ class NERDataMaker:
 
         for _, row in tqdm(df.iterrows()):
             # pass tokens with labels
-            tokens_with_entities = tokenize_and_label(row, tokenizer)
+            tokens_with_entities = tokenize_and_label(row, self.tokenizer)
             for _, ent in tokens_with_entities:
                 if ent not in self.unique_entities:
                     self.unique_entities.append(ent)
@@ -143,12 +152,12 @@ class NERDataMaker:
         else:
             return [_process_tokens_for_one_text(i+idx.start, tee) for i, tee in enumerate(tokens_with_encoded_entities)]
 
-    def as_hf_dataset(self, tokenizer : AutoTokenizer, window_length) -> Dataset:
+    def as_hf_dataset(self, window_length) -> Dataset:
 
         def generate_input_ids_labels(examples):
             # remember we need to add the start and end token id (they will have label -100)
             tokenized_inputs = {
-                'input_ids' : [[tokenizer.cls_token_id] + tokenizer.convert_tokens_to_ids(e)[:window_length-2]+ [tokenizer.eos_token_id]  for e in examples["tokens"]], 
+                'input_ids' : [[self.tokenizer.cls_token_id] + self.tokenizer.convert_tokens_to_ids(e)[:window_length-2]+ [self.tokenizer.eos_token_id] for e in examples["tokens"]], 
                 'labels' : [[-100] + e[:window_length-2] + [-100] for e in examples['ner_tags']] 
             }
             
@@ -287,9 +296,9 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                         end = start + self.window_length - 2
 
                         window_input_ids = torch.cat([
-                            torch.tensor([[CLS_ID]]).to(self.device),
+                            torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
                             tokens['input_ids'][:, start:end],
-                            torch.tensor([[SEP_ID]]).to(self.device)
+                            torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
                         ], dim=1)
                         window_logits = self.model(
                             input_ids=window_input_ids)[0][0].cpu().numpy()
