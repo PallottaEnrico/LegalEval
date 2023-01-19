@@ -2,7 +2,7 @@ import re
 from transformers import AutoTokenizer, TokenClassificationPipeline
 from datasets import Dataset, Features, Value, ClassLabel, Sequence
 import pandas as pd
-import tqdm
+from tqdm import tqdm
 from typing import Union, List, Optional
 from transformers.pipelines import AggregationStrategy
 import torch
