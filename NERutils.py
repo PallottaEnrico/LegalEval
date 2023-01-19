@@ -156,7 +156,7 @@ class NERDataMaker:
         else:
             return [_process_tokens_for_one_text(i+idx.start, tee) for i, tee in enumerate(tokens_with_encoded_entities)]
 
-    def as_hf_dataset(self, window_length) -> Dataset:
+    def as_hf_dataset(self, window_length, sl_window : Bool) -> Dataset:
 
         def generate_input_ids_labels(examples):
             # remember we need to add the start and end token id (they will have label -100)
@@ -167,30 +167,33 @@ class NERDataMaker:
             
             return tokenized_inputs
 
-        ids, ner_tags, tokens = [], [], []
-        for i, pt in enumerate(self.processed_texts):
-            # ids.append(i)
-            pt_tokens,pt_tags = list(zip(*pt))
-            
-            for start in range(0, len(pt_tokens) - 1, window_length // 2): # stride half window length
-              end = start + window_length - 2
-                    
-              window_tokens = pt_tokens[start:end]
-              window_ner_tags = pt_tags[start:end]
+        ner_tags, tokens = [], []
+        
+        if sl_window:
+            for i, pt in enumerate(self.processed_texts):
+                pt_tokens,pt_tags = list(zip(*pt))
 
-              ner_tags.append(window_ner_tags)
-              tokens.append(window_tokens)
+                for start in range(0, len(pt_tokens) - 1, window_length // 2): # stride half window length
+                  end = start + window_length - 2
 
+                  window_tokens = pt_tokens[start:end]
+                  window_ner_tags = pt_tags[start:end]
+
+                  ner_tags.append(window_ner_tags)
+                  tokens.append(window_tokens)
+        else:
+            for i, pt in enumerate(self.processed_texts):
+                pt_tokens,pt_tags = list(zip(*pt))
+                ner_tags.append(pt_tags)
+                tokens.append(pt_tokens)
             
         data = {
-            # "id": ids,
             "ner_tags": ner_tags,
             "tokens": tokens
         }
         features = Features({
             "tokens": Sequence(Value("string")),
-            "ner_tags": Sequence(ClassLabel(names=self.unique_entities)),
-            # "id": Value("int32")
+            "ner_tags": Sequence(ClassLabel(names=self.unique_entities))
         })
         ds = Dataset.from_dict(data, features)
         tokenized_ds = ds.map(generate_input_ids_labels, batched=True)
