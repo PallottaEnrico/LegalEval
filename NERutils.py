@@ -76,9 +76,13 @@ def tokenize_and_label(row : dict, tokenizer : AutoTokenizer):
   # "pointer" (in the whole context without spaces) to first character of the current token
   actual_char_index = 0
 
+  # most transformers' tokenizers add a special character to the first sub-token of a word
+  # dummy tokenization to retrieve it
+  init_special_char = tokenizer.tokenize('dummy')[0][0]
+
   for _, token in enumerate(tokens_context):
     # remove init character if present
-    clean_tok = token.replace(SPECIAL, "")
+    clean_tok = token.replace(init_special_char, "")
     
     for lbl_index , (start, end , label) in enumerate(zip(char_wise_start, char_wise_end, row['label'])):
       # check if the pointer is inside an entity
