@@ -156,7 +156,7 @@ class NERDataMaker:
         else:
             return [_process_tokens_for_one_text(i+idx.start, tee) for i, tee in enumerate(tokens_with_encoded_entities)]
 
-    def as_hf_dataset(self, window_length, sl_window : Bool) -> Dataset:
+    def as_hf_dataset(self, window_length, sl_window) -> Dataset:
 
         def generate_input_ids_labels(examples):
             # remember we need to add the start and end token id (they will have label -100)
