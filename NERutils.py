@@ -78,8 +78,10 @@ def tokenize_and_label(row : dict, tokenizer : AutoTokenizer):
 
   # most transformers' tokenizers add a special character to the first sub-token of a word
   # dummy tokenization to retrieve it
-  #init_special_char = tokenizer.tokenize('dummy')[0][0]
-  init_special_char = '##'
+  init_special_char = tokenizer.tokenize('dummy')[0][0]
+  if init_special_char == 'd':
+    # bert models do not use special char for first sub-token, they use ## for all the other sub-tokens
+    init_special_char = '##'
 
   for _, token in enumerate(tokens_context):
     # remove init character if present
@@ -161,11 +163,14 @@ class NERDataMaker:
 
         def generate_input_ids_labels(examples):
             # remember we need to add the start and end token id (they will have label -100)
+            input_ids = [[self.tokenizer.cls_token_id] + self.tokenizer.convert_tokens_to_ids(e)[:window_length-2]+ [self.tokenizer.sep_token_id] for e in examples["tokens"]]
+            labels = [[-100] + e[:window_length-2] + [-100] for e in examples['ner_tags']] 
+
             tokenized_inputs = {
-                'input_ids' : [[self.tokenizer.cls_token_id] + self.tokenizer.convert_tokens_to_ids(e)[:window_length-2]+ [self.tokenizer.eos_token_id] for e in examples["tokens"]], 
-                'labels' : [[-100] + e[:window_length-2] + [-100] for e in examples['ner_tags']] 
+                'input_ids' : input_ids, 
+                'labels' : labels
             }
-            
+                
             return tokenized_inputs
 
         ner_tags, tokens = [], []
@@ -340,3 +345,4 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
         if len(answers) == 1:
             return answers[0]
         return answers
+
