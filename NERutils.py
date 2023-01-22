@@ -8,6 +8,58 @@ from transformers.pipelines import AggregationStrategy
 import torch
 import numpy as np
 
+def clean_data(row):
+    
+    start = row['start']
+    end = row['end']
+    context = row['context']
+    text = row['text']
+
+    new_start, new_end, new_text = [], [], []
+
+    # for each start-end index
+    for s,e in zip(start,end):
+        
+        # extract the context until the start of the text
+        tmp = context[:s]
+        # compute the difference between the length of the context and of the cleaned context
+        len_before = len(tmp)
+        
+        # clean everything before the entity start
+        tmp_stripped = re.sub('\s+', ' ', tmp)
+        
+        len_after = len(tmp_stripped)
+        
+        to_remove_first = len_before - len_after
+        # define the new start index
+        new_start.append(s-to_remove_first)
+            
+        # extract the context between the indices
+        tmp = context[s:e]
+        # compute the difference between the length of the context and of the cleaned context
+        len_before = len(tmp)
+
+        # clean everything between start and end.
+        tmp_stripped = re.sub('\s+', ' ', tmp)
+
+        len_after = len(tmp_stripped)
+        to_remove_after = len_before - len_after
+        # # define the new end index
+        new_end.append(e - (to_remove_first + to_remove_after))
+        
+        new_text.append(tmp_stripped)
+        
+    # define the full cleaned context   
+    new_context = re.sub('\s+', ' ', context)
+
+    # assign the new value to the row
+    row['start'] = new_start
+    row['end'] = new_end
+    row['context'] = new_context
+    row['text'] = new_text
+    
+    return row
+
 def adapt_indexes_without_spaces(row):
     """
     This function is very similar to the clean data one, it basically removes any possible space and adapt the start/end indexes consequently.
