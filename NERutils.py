@@ -227,21 +227,18 @@ class NERDataMaker:
 
         ner_tags, tokens = [], []
         
-        if sl_window:
-            for i, pt in enumerate(self.processed_texts):
-                pt_tokens,pt_tags = list(zip(*pt))
-
+        for i, pt in enumerate(self.processed_texts):
+            pt_tokens,pt_tags = list(zip(*pt))
+            if sl_window and len(pt_tokens) > window_length:
                 for start in range(0, len(pt_tokens) - 1, window_length // 2): # stride half window length
-                  end = start + window_length - 2
+                    end = start + window_length - 2
 
-                  window_tokens = pt_tokens[start:end]
-                  window_ner_tags = pt_tags[start:end]
+                    window_tokens = pt_tokens[start:end]
+                    window_ner_tags = pt_tags[start:end]
 
-                  ner_tags.append(window_ner_tags)
-                  tokens.append(window_tokens)
-        else:
-            for i, pt in enumerate(self.processed_texts):
-                pt_tokens,pt_tags = list(zip(*pt))
+                    ner_tags.append(window_ner_tags)
+                    tokens.append(window_tokens)
+            else:
                 ner_tags.append(pt_tags)
                 tokens.append(pt_tokens)
             
