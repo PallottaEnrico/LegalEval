@@ -2,6 +2,7 @@ from typing import Union, List, Optional
 import torch
 import numpy as np
 import copy
+import re
 from transformers.pipelines import AggregationStrategy, TokenClassificationPipeline
 
 class SlidingWindowNERPipeline(TokenClassificationPipeline):
