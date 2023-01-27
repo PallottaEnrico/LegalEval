@@ -1,3 +1,8 @@
+from typing import Union, List, Optional
+import torch
+import numpy as np
+from transformers.pipelines import AggregationStrategy
+
 class SlidingWindowNERPipeline(TokenClassificationPipeline):
     """Modified version of TokenClassificationPipeline that uses a sliding
     window approach to fit long texts into the limited position embeddings of a
