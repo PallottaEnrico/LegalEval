@@ -265,12 +265,11 @@ class CustomModelForTokenClassification(XLNetPreTrainedModel):
         self.num_labels = config.num_labels
         self.transformer = XLNetModel(config)
         
-        self.LSTM = 'LSTM' in custom_layers.keys() and custom_layers['LSTM'] == True
+        self.num_LSTM = custom_layers['LSTM'] if 'LSTM' in custom_layers.keys() else 0
         self.CRF = 'CRF' in custom_layers.keys() and custom_layers['CRF'] == True
 
-        if self.LSTM:
-            self.num_layers = 1
-            self.lstm = nn.LSTM(config.hidden_size, config.hidden_size//2, num_layers = self.num_layers, bidirectional=True, dropout=0.5)
+        if self.num_LSTM:
+            self.lstm = nn.LSTM(config.hidden_size, config.hidden_size//2, num_layers = self.num_LSTM, bidirectional=True, dropout=0.5)
         
         if self.CRF:
             self.crf = CRF(config.num_labels, batch_first=True)
@@ -324,7 +323,7 @@ class CustomModelForTokenClassification(XLNetPreTrainedModel):
 
         sequence_output = outputs[0]
                 
-        if self.LSTM:
+        if self.num_LSTM:
             # Forward propagate through LSTM
             sequence_output, _ = self.lstm(sequence_output) 
 
