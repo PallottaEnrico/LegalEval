@@ -290,11 +290,11 @@ def remap_predictions(df, df_clean, predictions):
     """
         Escape special characters in a string.
     """
-    if isinstance(pattern, str):
-        return pattern.translate(special_chars_map)
-    else:
-        pattern = str(pattern, 'latin1')
-        return pattern.translate(special_chars_map).encode('latin1')
+        if isinstance(pattern, str):
+            return pattern.translate(special_chars_map)
+        else:
+            pattern = str(pattern, 'latin1')
+            return pattern.translate(special_chars_map).encode('latin1')
     
     predictions_cp = copy.copy(predictions)
     
