@@ -266,11 +266,14 @@ class CustomModelForTokenClassification(XLNetPreTrainedModel):
         self.custom_layers = custom_layers
         self.transformer = XLNetModel(config)
         
-        if self.custom_layers['LSTM'] == True:
+        self.LSTM = 'LSTM' in self.custom_layers.keys() and self.custom_layers['LSTM'] == True
+        self.CRF = 'CRF' in self.custom_layers.keys() and self.custom_layers['CRF'] == True
+
+        if self.LSTM:
             self.num_layers = 1
             self.lstm = nn.LSTM(config.hidden_size, config.hidden_size//2, num_layers = self.num_layers, bidirectional=True, dropout=0.5)
         
-        if self.custom_layers['CRF'] == True:
+        if self.CRF:
             self.crf = CRF(config.num_labels, batch_first=True)
             self.crf.reset_parameters()
         
@@ -322,14 +325,14 @@ class CustomModelForTokenClassification(XLNetPreTrainedModel):
 
         sequence_output = outputs[0]
                 
-        if self.custom_layers['LSTM'] == True:
+        if self.LSTM:
             # Forward propagate through LSTM
             sequence_output, _ = self.lstm(sequence_output) 
 
         logits = self.classifier(sequence_output)
         loss = None
         
-        if self.custom_layers['CRF'] == True:
+        if self.CRF:
             if labels is not None:
                 loss = -self.crf(emissions=logits, tags=labels, mask=attention_mask.byte(), reduction='token_mean')
                 logits = self.crf.decode(logits)
@@ -351,4 +354,4 @@ class CustomModelForTokenClassification(XLNetPreTrainedModel):
             mems=outputs.mems,
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
-        )  
+        ) 
