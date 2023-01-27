@@ -287,9 +287,7 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
 def remap_predictions(df, df_clean, predictions):
     
     def escape(pattern):
-    """
-        Escape special characters in a string.
-    """
+        """Escape special characters in a string."""
         if isinstance(pattern, str):
             return pattern.translate(special_chars_map)
         else:
