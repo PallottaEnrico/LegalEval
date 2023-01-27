@@ -1,7 +1,7 @@
 from typing import Union, List, Optional
 import torch
 import numpy as np
-from transformers.pipelines import AggregationStrategy
+from transformers.pipelines import AggregationStrategy, TokenClassificationPipeline
 
 class SlidingWindowNERPipeline(TokenClassificationPipeline):
     """Modified version of TokenClassificationPipeline that uses a sliding
