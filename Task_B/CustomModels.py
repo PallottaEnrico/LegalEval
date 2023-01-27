@@ -263,11 +263,10 @@ class CustomModelForTokenClassification(XLNetPreTrainedModel):
     def __init__(self, config, custom_layers):
         super().__init__(config)
         self.num_labels = config.num_labels
-        self.custom_layers = custom_layers
         self.transformer = XLNetModel(config)
         
-        self.LSTM = 'LSTM' in self.custom_layers.keys() and self.custom_layers['LSTM'] == True
-        self.CRF = 'CRF' in self.custom_layers.keys() and self.custom_layers['CRF'] == True
+        self.LSTM = 'LSTM' in custom_layers.keys() and custom_layers['LSTM'] == True
+        self.CRF = 'CRF' in custom_layers.keys() and custom_layers['CRF'] == True
 
         if self.LSTM:
             self.num_layers = 1
