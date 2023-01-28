@@ -183,7 +183,6 @@ def rearrange_df(data: list,
     dataset = []
 
     for doc in tqdm(data):
-        print('PIPPO')
         for doc_ann in doc['annotations']:
             for sent in doc_ann['result']:
                 sentence = sent['value']['text']
