@@ -13,6 +13,17 @@ def set_reproducibility(seed: int):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
+
+def labels_frequency(df: pd.DataFrame):
+    labels = list(df['label'])
+    colors = dict(zip(set(labels), plt.cm.rainbow(np.linspace(0, 1, len(set(labels))))))
+    for c in set(labels):
+        plt.hist([labels[i] for i in range(len(labels)) if labels[i] == c], bins=np.arange(14) - 0.5, rwidth=0.7,
+                 color=colors[c])
+    plt.rcParams["figure.figsize"] = (20, 5)
+    plt.show()
+
+
 def compute_metrics(eval_pred):
     """
       Params:
