@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import torch
 import evaluate
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 
 def set_reproducibility(seed: int):
@@ -17,6 +18,13 @@ def set_reproducibility(seed: int):
 
 
 def labels_frequency(df: pd.DataFrame):
+    """
+      Plots the frequency of the labels of the given dataset
+
+      Params:
+        df: dataset
+    """
+
     labels = list(df['label'])
     colors = dict(zip(set(labels), plt.cm.rainbow(np.linspace(0, 1, len(set(labels))))))
     for c in set(labels):
@@ -46,3 +54,28 @@ def compute_metrics(eval_pred):
         'Accuracy': accuracy,
         'Weighted F1': weighted_f1,
     }
+
+
+def plot_confusion_matrix(true: list,
+                          predictions: list,
+                          labels_name: list,
+                          normalize: str = None,
+                          title: str = "Confusion Matrix"):
+    """
+      Plots the confusion matrix
+
+      Params:
+        true: true labels
+        predictions: labels predicted
+        labels_name: name of the labels
+        normalize: normalization of the confusion matrix
+        title: title of the plot
+    """
+
+    cm = confusion_matrix(true, predictions, normalize=normalize)
+    cmp = ConfusionMatrixDisplay(cm, display_labels=labels_name)
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.set_title(title)
+    cmp.plot(ax=ax, cmap=plt.cm.Blues, xticks_rotation=90, colorbar=False)
+    cax = fig.add_axes([ax.get_position().x1 + 0.01, ax.get_position().y0, 0.02, ax.get_position().height])
+    plt.colorbar(cmp.im_, cax=cax)
