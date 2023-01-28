@@ -1,7 +1,9 @@
 from typing import Union, List, Optional
 import torch
 import numpy as np
-from transformers.pipelines import AggregationStrategy
+import copy
+import re
+from transformers.pipelines import AggregationStrategy, TokenClassificationPipeline
 
 class SlidingWindowNERPipeline(TokenClassificationPipeline):
     """Modified version of TokenClassificationPipeline that uses a sliding
@@ -219,9 +221,9 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
                         end = start + self.window_length - 2
                         
                         window_input_ids = torch.cat([
-                            torch.tensor([[CLS_ID]]).to(self.device),
+                            torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
                             tokens['input_ids'][:, start:end],
-                            torch.tensor([[SEP_ID]]).to(self.device)
+                            torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
                         ], dim=1)
                         window_logits = self.model(
                             input_ids=window_input_ids)[0][0].cpu().numpy()
@@ -281,3 +283,58 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
         if len(answers) == 1:
             return answers[0]
         return answers
+    
+
+def remap_predictions(df, df_clean, predictions):
+    
+    def escape(pattern):
+        """Escape special characters in a string."""
+        if isinstance(pattern, str):
+            return pattern.translate(special_chars_map)
+        else:
+            pattern = str(pattern, 'latin1')
+            return pattern.translate(special_chars_map).encode('latin1')
+    
+    predictions_cp = copy.copy(predictions)
+    
+    special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|^$\\.&~#\t\n\r\v\f'}
+
+    for row, row_clean, i in zip(df.iloc, df_clean.iloc, range(len(predictions_cp))):
+        
+        pred = predictions_cp[i]
+        context = row['context']
+        context_clean = row_clean['context']
+        
+        text = [row_clean['context'][p['start']:p['end']] for p in pred]
+        
+        start = []
+        end = []
+        off = 0
+        
+        s_temp = [p['start'] for p in pred]
+        try:
+            for t,tmp in zip(text,s_temp):
+                
+                while True: # avoid infinite loops
+                    s1 = escape(t)
+                    s2 = context[off:]
+                    match = re.search(r'\s*'.join(s1.split()), s2)
+                    s, e = match.start(), match.end()
+                    
+                    string_clean = context_clean[:tmp]
+                    string = context[:s+off]
+                    if re.sub('\s+', '', string) == re.sub('\s+', '', string_clean):
+                       break
+                    off += e
+                
+                start.append(s+off)
+                end.append(e+off)
+                off = end[-1]
+                    
+            for j in range(len(pred)):
+                predictions_cp[i][j]['start'] = start[j]
+                predictions_cp[i][j]['end'] = end[j]
+        except Exception as e:
+            print(e)
+            print("Corrispondence not found")
+    return predictions_cp

@@ -214,7 +214,7 @@ class NERDataMaker:
         def generate_input_ids_labels(examples):
             # CRF does not allow -100 as token id, so we'll not add it.
             if CRF:
-                input_ids = [tokenizer.convert_tokens_to_ids(e)[:window_length-2] for e in examples["tokens"]]
+                input_ids = [self.tokenizer.convert_tokens_to_ids(e)[:window_length-2] for e in examples["tokens"]]
                 labels = [e[:window_length-2] for e in examples['ner_tags']]   
             else:
                 input_ids = [[self.tokenizer.cls_token_id] + self.tokenizer.convert_tokens_to_ids(e)[:window_length-2]+ [self.tokenizer.sep_token_id] for e in examples["tokens"]]
