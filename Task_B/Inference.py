@@ -278,7 +278,7 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
                         ]
                         answers.append(entities)
                     else:
-                        answers.append(grouped_entities)
+                        answers.append(entities)
 
         if len(answers) == 1:
             return answers[0]
