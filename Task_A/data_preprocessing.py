@@ -183,6 +183,7 @@ def rearrange_df(data: list,
     dataset = []
 
     for doc in tqdm(data):
+        print('PIPPO')
         for doc_ann in doc['annotations']:
             for sent in doc_ann['result']:
                 sentence = sent['value']['text']
@@ -197,5 +198,8 @@ def rearrange_df(data: list,
                 dataset.append(temp_list)
 
     new_dataset = pd.DataFrame(dataset, columns=cols)
+
+    # Drop duplicates
+    new_dataset.drop_duplicates(['text', 'sentence'], inplace = True)
 
     return new_dataset
