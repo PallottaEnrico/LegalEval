@@ -76,6 +76,6 @@ def plot_confusion_matrix(true: list,
     cmp = ConfusionMatrixDisplay(cm, display_labels=labels_name)
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.set_title(title)
-    cmp.plot(ax=ax, cmap=plt.cm.Blues, xticks_rotation=90, colorbar=False)
+    cmp.plot(ax=ax, cmap=plt.cm.Blues, values_format='.2f', xticks_rotation=90, colorbar=False)
     cax = fig.add_axes([ax.get_position().x1 + 0.01, ax.get_position().y0, 0.02, ax.get_position().height])
     plt.colorbar(cmp.im_, cax=cax)
