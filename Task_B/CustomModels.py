@@ -78,14 +78,12 @@ class CustomRobertaForTokenClassification(RobertaPreTrainedModel):
 
         if self.CRF:
               if labels is not None:
-
                   loss = -self.crf(emissions=logits, tags=labels, mask=attention_mask.byte(), reduction='token_mean')
                   logits = self.crf.decode(logits)
-
               else:
                   logits = self.crf.decode(logits)
               logits = torch.Tensor(logits)
-         else:
+        else:
               if labels is not None:
                   loss_fct = CrossEntropyLoss()
                   loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
