@@ -103,6 +103,7 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                                         (num_labels,))
                     writes = np.zeros(entities.shape)
                     
+                    print(tokens['input_ids'].shape[1])
                     if (tokens['input_ids'].shape[1] > self.window_length):
                         for start in range(
                                 0, tokens['input_ids'].shape[1] - 1,
