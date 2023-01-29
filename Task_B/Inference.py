@@ -286,11 +286,11 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
 
 def remap_predictions(df, df_clean, predictions):
     
-    """Meth.
-    """
+    """Method to remap the indices of the predictions on cleaned data that correspond 
+       to the original data."""
     
     def escape(pattern):
-        """Escape special characters in a string."""
+        """Escape special characters in a string, except for single space."""
         if isinstance(pattern, str):
             return pattern.translate(special_chars_map)
         else:
