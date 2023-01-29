@@ -102,20 +102,31 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                     entities = np.zeros(tokens['input_ids'].shape[1:] +
                                         (num_labels,))
                     writes = np.zeros(entities.shape)
-                    for start in range(
-                            0, tokens['input_ids'].shape[1] - 1,
-                            self.stride):
-                        end = start + self.window_length - 2
+                    
+                    if (tokens['input_ids'].shape[1]-1 > self.window_length ):
+                        for start in range(
+                                0, tokens['input_ids'].shape[1] - 1,
+                                self.stride):
+                            end = start + self.window_length - 2
 
+                            window_input_ids = torch.cat([
+                                torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
+                                tokens['input_ids'][:, start:end],
+                                torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
+                            ], dim=1)
+                            window_logits = self.model(
+                                input_ids=window_input_ids)[0][0].cpu().numpy()
+                            entities[start:end] += window_logits[1:-1]
+                            writes[start:end] += 1
+                    else:
                         window_input_ids = torch.cat([
-                            torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
-                            tokens['input_ids'][:, start:end],
-                            torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
-                        ], dim=1)
-                        window_logits = self.model(
-                            input_ids=window_input_ids)[0][0].cpu().numpy()
-                        entities[start:end] += window_logits[1:-1]
-                        writes[start:end] += 1
+                                torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
+                                tokens['input_ids'][:,],
+                                torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
+                            ], dim=1)
+                        window_logits = self.model(input_ids=window_input_ids)[0][0].cpu().numpy()
+                        entities = window_logits[1:-1]
+                        
                     # Old way for getting logits under PyTorch
                     # entities = self.model(**tokens)[0][0].cpu().numpy()
                     input_ids = tokens["input_ids"].cpu().numpy()[0]
@@ -214,7 +225,6 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
                     # Get logits (i.e. tag scores)
                     entities = np.zeros(tokens['input_ids'].shape[1:])
                     writes = np.zeros(entities.shape)
-                    # ROBERTA
                     
                     if (tokens['input_ids'].shape[1]-1 > self.window_length ):
                         for start in range(
@@ -232,11 +242,10 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
 
                             entities[start:end] = window_logits[1:-1]
                     else:
-                    # XLNET
                         window_input_ids = torch.cat([
-                                torch.tensor([[CLS_ID]]).to(self.device),
+                                torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
                                 tokens['input_ids'][:,],
-                                torch.tensor([[SEP_ID]]).to(self.device)
+                                torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
                             ], dim=1)
                         window_logits = self.model(input_ids=window_input_ids)[0][0].cpu().numpy()
                         entities = window_logits[1:-1]
