@@ -118,6 +118,7 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                                 input_ids=window_input_ids)[0][0].cpu().numpy()
                             entities[start:end] += window_logits[1:-1]
                             writes[start:end] += 1
+                        entities = entities / writes
                     else:
                         window_input_ids = torch.cat([
                                 torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
@@ -130,7 +131,7 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                     # Old way for getting logits under PyTorch
                     # entities = self.model(**tokens)[0][0].cpu().numpy()
                     input_ids = tokens["input_ids"].cpu().numpy()[0]
-                    entities = entities / writes
+                    
 
                     scores = np.exp(entities) / np.exp(entities).sum(
                         -1, keepdims=True)
