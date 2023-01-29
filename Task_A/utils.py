@@ -30,7 +30,7 @@ def labels_frequency(df: pd.DataFrame):
     for c in set(labels):
         plt.hist([labels[i] for i in range(len(labels)) if labels[i] == c], bins=np.arange(14) - 0.5, rwidth=0.7,
                  color=colors[c])
-    plt.rcParams["figure.figsize"] = (20, 5)
+    plt.rcParams["figure.figsize"] = (22, 5)
     plt.show()
 
 
