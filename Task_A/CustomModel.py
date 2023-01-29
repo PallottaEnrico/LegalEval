@@ -17,13 +17,13 @@ class BertSequenceClassifier(nn.Module):
                                               use_cache=False)
 
         # Dropout layer
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(0.2)
 
         # LSTM layer
         self.lstm = nn.LSTM(self.bert.config.hidden_size, 256, batch_first=True, num_layers=1, bidirectional=True)
 
         # Another dropout layer
-        self.dropout2 = nn.Dropout(0.3)
+        self.dropout2 = nn.Dropout(0.2)
 
         # Another LSTM layer
         self.lstm2 = nn.LSTM(512, 256, num_layers=1, batch_first=True, bidirectional=True)
