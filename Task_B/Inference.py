@@ -103,8 +103,7 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                                         (num_labels,))
                     writes = np.zeros(entities.shape)
                     
-                    print(tokens['input_ids'].shape[1])
-                    if (tokens['input_ids'].shape[1] > self.window_length):
+                    if tokens['input_ids'].shape[1] > self.window_length:
                         for start in range(
                                 0, tokens['input_ids'].shape[1] - 1,
                                 self.stride):
@@ -227,7 +226,7 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
                     entities = np.zeros(tokens['input_ids'].shape[1:])
                     writes = np.zeros(entities.shape)
                     
-                    if (tokens['input_ids'].shape[1]-1 > self.window_length ):
+                    if tokens['input_ids'].shape[1] > self.window_length:
                         for start in range(
                                 0, tokens['input_ids'].shape[1] - 1,
                                 self.stride):
