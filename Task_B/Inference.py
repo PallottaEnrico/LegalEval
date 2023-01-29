@@ -103,7 +103,8 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                                         (num_labels,))
                     writes = np.zeros(entities.shape)
                     
-                    if tokens['input_ids'].shape[1] > self.window_length:
+#                     if tokens['input_ids'].shape[1] > self.window_length:
+                      if True:
                         for start in range(
                                 0, tokens['input_ids'].shape[1] - 1,
                                 self.stride):
@@ -119,14 +120,14 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                             entities[start:end] += window_logits[1:-1]
                             writes[start:end] += 1
                         entities = entities / writes
-                    else:
-                        window_input_ids = torch.cat([
-                                torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
-                                tokens['input_ids'][:,],
-                                torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
-                            ], dim=1)
-                        window_logits = self.model(input_ids=window_input_ids)[0][0].cpu().numpy()
-                        entities = window_logits[1:-1]
+#                     else:
+#                         window_input_ids = torch.cat([
+#                                 torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
+#                                 tokens['input_ids'][:,],
+#                                 torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
+#                             ], dim=1)
+#                         window_logits = self.model(input_ids=window_input_ids)[0][0].cpu().numpy()
+#                         entities = window_logits[1:-1]
                         
                     # Old way for getting logits under PyTorch
                     # entities = self.model(**tokens)[0][0].cpu().numpy()
