@@ -294,23 +294,21 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
             return answers[0]
         return answers
     
+def escape(pattern):
+    """Escape special characters in a string, except for single space."""
+    special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|^$\\.&~#\t\n\r\v\f'}
+    if isinstance(pattern, str):
+        return pattern.translate(special_chars_map)
+    else:
+        pattern = str(pattern, 'latin1')
+        return pattern.translate(special_chars_map).encode('latin1')
+    
 
 def remap_predictions(df, df_clean, predictions):
-    
     """Method to remap the indices of the predictions on cleaned data that correspond 
        to the original data."""
     
-    def escape(pattern):
-        """Escape special characters in a string, except for single space."""
-        if isinstance(pattern, str):
-            return pattern.translate(special_chars_map)
-        else:
-            pattern = str(pattern, 'latin1')
-            return pattern.translate(special_chars_map).encode('latin1')
-    
     predictions_cp = copy.copy(predictions)
-    
-    special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|^$\\.&~#\t\n\r\v\f'}
 
     for row, row_clean, i in zip(df.iloc, df_clean.iloc, range(len(predictions_cp))):
         
@@ -351,3 +349,36 @@ def remap_predictions(df, df_clean, predictions):
             print(e)
             print("Corrispondence not found")
     return predictions_cp
+
+
+def remap_predictions_context(context, context_clean, pred):
+    text = [context_clean[p['start']:p['end']] for p in pred]
+    start,end = [], []
+    off = 0
+    
+    s_temp = [p['start'] for p in pred]
+    try:
+        for t,tmp in zip(text,s_temp):
+            while True:
+                s1 = escape(t)
+                s2 = context[off:]
+                match = re.search(r'\s*'.join(s1.split()), s2)
+                s, e = match.start(), match.end()
+                
+                string_clean = context_clean[:tmp]
+                string = context[:s+off]
+                if re.sub('\s+', '', string) == re.sub('\s+', '', string_clean): break
+                off += e
+            
+            start.append(s+off)
+            end.append(e+off)
+            off = end[-1]
+                
+        for j in range(len(pred)):
+            pred[j]['start'] = start[j]
+            pred[j]['end'] = end[j]
+            pred[j]['word'] = context[start[j]:end[j]]
+    except Exception as e:
+        print(e)
+        print("Corrispondence not found")
+    return pred
