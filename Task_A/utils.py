@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import re
 import matplotlib.pyplot as plt
 import random
 import torch
@@ -89,3 +90,29 @@ def plot_confusion_matrix(true: list,
     cmp.plot(ax=ax[0], cmap=plt.cm.Blues, xticks_rotation=90, colorbar=False)
     cmp_rec.plot(ax=ax[1], cmap=plt.cm.Blues, values_format='.2f', xticks_rotation=90, colorbar=False)
     cmp_prec.plot(ax=ax[2], cmap=plt.cm.Blues, values_format='.2f', xticks_rotation=90, colorbar=False)
+
+
+def print_document(test_df: pd.DataFrame,
+                   y_test: list,
+                   y_pred: list,
+                   id2label: dict,
+                   doc_id: int):
+
+    x_test = test_df.copy()
+    x_test.reset_index(inplace=True)
+    doc = x_test[x_test['doc_id'] == doc_id]
+
+    print('|True class\t|Predicted class|')
+    print('|---------------|---------------|')
+    max_len_pred = max([len(id2label[y_pred[idx]]) for idx in doc.index])
+    max_len_true = max([len(id2label[y_test[idx]]) for idx in doc.index])
+    for s in range(len(doc)):
+        idx = doc.index[s]
+        pred = id2label[y_pred[idx]]
+        true = id2label[y_test[idx]]
+        sentence = re.findall(r'\S+', x_test.iloc[idx]['sentence'])
+        if pred != true:
+            print(
+                f'|\033[91m{true.ljust(max_len_true)}\t\033[0m|\033[91m{pred.ljust(max_len_pred)}\t\033[0m|\033[91m\t{" ".join(sentence)}\033[0m')
+        else:
+            print(f'|{true.ljust(max_len_true)}\t|{pred.ljust(max_len_pred)}\t|\t{" ".join(sentence)}')
