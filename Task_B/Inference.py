@@ -102,9 +102,8 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                     entities = np.zeros(tokens['input_ids'].shape[1:] +
                                         (num_labels,))
                     writes = np.zeros(entities.shape)
-                    for start in range(
-                            0, tokens['input_ids'].shape[1] - 1,
-                            self.stride):
+                    
+                    for start in range(0, tokens['input_ids'].shape[1] - 1, self.stride):
                         end = start + self.window_length - 2
 
                         window_input_ids = torch.cat([
@@ -112,14 +111,13 @@ class SlidingWindowNERPipeline(TokenClassificationPipeline):
                             tokens['input_ids'][:, start:end],
                             torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
                         ], dim=1)
-                        window_logits = self.model(
-                            input_ids=window_input_ids)[0][0].cpu().numpy()
+                        window_logits = self.model(input_ids=window_input_ids)[0][0].cpu().numpy()
                         entities[start:end] += window_logits[1:-1]
                         writes[start:end] += 1
-                    # Old way for getting logits under PyTorch
-                    # entities = self.model(**tokens)[0][0].cpu().numpy()
-                    input_ids = tokens["input_ids"].cpu().numpy()[0]
+                        
                     entities = entities / writes
+
+                    input_ids = tokens["input_ids"].cpu().numpy()[0]
 
                     scores = np.exp(entities) / np.exp(entities).sum(
                         -1, keepdims=True)
@@ -214,34 +212,31 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
                     # Get logits (i.e. tag scores)
                     entities = np.zeros(tokens['input_ids'].shape[1:])
                     writes = np.zeros(entities.shape)
-                    # ROBERTA
-                    for start in range(
-                            0, tokens['input_ids'].shape[1] - 1,
-                            self.stride):
-                        end = start + self.window_length - 2
-                        
+                    
+                    if tokens['input_ids'].shape[1] > self.window_length:
+                        for start in range(
+                                0, tokens['input_ids'].shape[1] - 1,
+                                self.stride):
+                            end = start + self.window_length - 2
+
+                            window_input_ids = torch.cat([
+                                torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
+                                tokens['input_ids'][:, start:end],
+                                torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
+                            ], dim=1)
+                            window_logits = self.model(
+                                input_ids=window_input_ids)[0][0].cpu().numpy()
+
+                            entities[start:end] = window_logits[1:-1]
+                    else:
                         window_input_ids = torch.cat([
-                            torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
-                            tokens['input_ids'][:, start:end],
-                            torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
-                        ], dim=1)
-                        window_logits = self.model(
-                            input_ids=window_input_ids)[0][0].cpu().numpy()
-                        
-                        entities[start:end] = window_logits[1:-1]
+                                torch.tensor([[self.tokenizer.cls_token_id]]).to(self.device),
+                                tokens['input_ids'][:,],
+                                torch.tensor([[self.tokenizer.sep_token_id]]).to(self.device)
+                            ], dim=1)
+                        window_logits = self.model(input_ids=window_input_ids)[0][0].cpu().numpy()
+                        entities = window_logits[1:-1]
                     
-                    # XLNET
-                    # window_input_ids = torch.cat([
-                    #         torch.tensor([[CLS_ID]]).to(self.device),
-                    #         tokens['input_ids'][:,],
-                    #         torch.tensor([[SEP_ID]]).to(self.device)
-                    #     ], dim=1)
-                    # window_logits = self.model(input_ids=window_input_ids)[0][0].cpu().numpy()
-                    # entities = window_logits[1:-1]
-                    
-                    
-                    # Old way for getting logits under PyTorch
-                    # entities = self.model(**tokens)[0][0].cpu().numpy()
                     input_ids = tokens["input_ids"].cpu().numpy()[0]
                     scores = entities
                     
@@ -284,20 +279,21 @@ class CrfSlidingWindowNERPipeline(SlidingWindowNERPipeline):
             return answers[0]
         return answers
     
+def escape(pattern):
+    """Escape special characters in a string, except for single space."""
+    special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|^$\\.&~#\t\n\r\v\f'}
+    if isinstance(pattern, str):
+        return pattern.translate(special_chars_map)
+    else:
+        pattern = str(pattern, 'latin1')
+        return pattern.translate(special_chars_map).encode('latin1')
+    
 
 def remap_predictions(df, df_clean, predictions):
-    
-    def escape(pattern):
-        """Escape special characters in a string."""
-        if isinstance(pattern, str):
-            return pattern.translate(special_chars_map)
-        else:
-            pattern = str(pattern, 'latin1')
-            return pattern.translate(special_chars_map).encode('latin1')
+    """Method to remap the indices of the predictions on cleaned data that correspond 
+       to the original data."""
     
     predictions_cp = copy.copy(predictions)
-    
-    special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|^$\\.&~#\t\n\r\v\f'}
 
     for row, row_clean, i in zip(df.iloc, df_clean.iloc, range(len(predictions_cp))):
         
@@ -338,3 +334,36 @@ def remap_predictions(df, df_clean, predictions):
             print(e)
             print("Corrispondence not found")
     return predictions_cp
+
+
+def remap_predictions_context(context, context_clean, pred):
+    text = [context_clean[p['start']:p['end']] for p in pred]
+    start,end = [], []
+    off = 0
+    
+    s_temp = [p['start'] for p in pred]
+    try:
+        for t,tmp in zip(text,s_temp):
+            while True:
+                s1 = escape(t)
+                s2 = context[off:]
+                match = re.search(r'\s*'.join(s1.split()), s2)
+                s, e = match.start(), match.end()
+                
+                string_clean = context_clean[:tmp]
+                string = context[:s+off]
+                if re.sub('\s+', '', string) == re.sub('\s+', '', string_clean): break
+                off += e
+            
+            start.append(s+off)
+            end.append(e+off)
+            off = end[-1]
+                
+        for j in range(len(pred)):
+            pred[j]['start'] = start[j]
+            pred[j]['end'] = end[j]
+            pred[j]['word'] = context[start[j]:end[j]]
+    except Exception as e:
+        print(e)
+        print("Corrispondence not found")
+    return pred
