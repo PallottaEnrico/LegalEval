@@ -24,7 +24,7 @@ class CustomRobertaForTokenClassification(RobertaPreTrainedModel):
         self.CRF = 'CRF' in custom_layers.keys() and custom_layers['CRF'] == True
 
         if self.num_LSTM:
-            self.lstm = nn.LSTM(config.hidden_size, config.hidden_size//2, num_layers = self.num_LSTM, bidirectional=True, dropout=0.5)
+            self.lstm = nn.LSTM(config.hidden_size, config.hidden_size//2, num_layers = self.num_LSTM, bidirectional=True, dropout=0.2)
         
         if self.CRF:
             self.crf = CRF(config.num_labels, batch_first=True)
