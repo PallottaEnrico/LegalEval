@@ -59,26 +59,33 @@ def compute_metrics(eval_pred):
 def plot_confusion_matrix(true: list,
                           predictions: list,
                           labels_name: list,
-                          normalize: str = None,
-                          title: str = "Confusion Matrix"):
+                          model_name: str = " "):
     """
-      Plots the confusion matrix
+      Plots three different confusion matrices:
+        - Confusion matrix not normalized
+        - Confusion matrix with the recall along the diagonal
+        - Confusion matrix with the precision along the diagonal
 
       Params:
         true: true labels
         predictions: labels predicted
         labels_name: name of the labels
-        normalize: normalization of the confusion matrix
-        title: title of the plot
+        model_name: name of the model
     """
 
-    cm = confusion_matrix(true, predictions, normalize=normalize)
+    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(37, 18))
+    ax[0].set_title('Confusion matrix not normalized - ' + model_name)
+    ax[1].set_title('Confusion matrix recall - ' + model_name)
+    ax[2].set_title('Confusion matrix precision - ' + model_name)
+
+    cm = confusion_matrix(true, predictions)
+    cm_rec = confusion_matrix(true, predictions, normalize='true')
+    cm_prec = confusion_matrix(true, predictions, normalize='pred')
+
     cmp = ConfusionMatrixDisplay(cm, display_labels=labels_name)
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.set_title(title)
-    if normalize is not None:
-        cmp.plot(ax=ax, cmap=plt.cm.Blues, values_format='.2f', xticks_rotation=90, colorbar=False)
-    else:
-        cmp.plot(ax=ax, cmap=plt.cm.Blues, xticks_rotation=90, colorbar=False)
-    cax = fig.add_axes([ax.get_position().x1 + 0.01, ax.get_position().y0, 0.02, ax.get_position().height])
-    plt.colorbar(cmp.im_, cax=cax)
+    cmp_rec = ConfusionMatrixDisplay(cm_rec, display_labels=labels_name)
+    cmp_prec = ConfusionMatrixDisplay(cm_prec, display_labels=labels_name)
+
+    cmp.plot(ax=ax[0], cmap=plt.cm.Blues, xticks_rotation=90, colorbar=False)
+    cmp_rec.plot(ax=ax[1], cmap=plt.cm.Blues, values_format='.2f', xticks_rotation=90, colorbar=False)
+    cmp_prec.plot(ax=ax[2], cmap=plt.cm.Blues, values_format='.2f', xticks_rotation=90, colorbar=False)
