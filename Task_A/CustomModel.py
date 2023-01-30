@@ -4,6 +4,17 @@ from transformers import (BertModel, )
 
 
 class BertSequenceClassifier(nn.Module):
+    """
+    BertSequenceClassifier is a class that implements a sequence classifier based on a pre-trained BERT model.
+    The classifier consists of:
+        - a pre-trained BERT model
+        - one dropout layer,
+        - one Bi-LSTM layer
+        - an average pooling performed at token level,
+        - one dropout layer,
+        - one Bi-LSTM layer,
+        - a linear output layer.
+    """
     def __init__(self, num_classes: int, bert_name: str, id2label: dict, label2id: dict, smoothing: int = 0.2):
         super(BertSequenceClassifier, self).__init__()
         self.num_classes = num_classes
@@ -40,25 +51,27 @@ class BertSequenceClassifier(nn.Module):
         bert_hidden = self.dropout(bert_hidden[0])
 
         # Pass the hidden state through the LSTM layer
+        # Shape: (batch, num words, hidden size)
         lstm_out, _ = self.lstm(bert_hidden)
-        # print(f'{lstm_out.shape = }')
 
+        # Shape: (batch, hidden size)
         lstm_sentence = torch.mean(lstm_out, dim=1)
 
+        # Shape: (1, batch, hidden size)
         lstm_sentence = torch.unsqueeze(lstm_sentence, dim=0)
-        # print(f'{lstm_sentence.shape = }')
 
         # Apply dropout
         lstm_sentence_dropout = self.dropout2(lstm_sentence)
 
         # Pass the output through another LSTM layer
+        # Shape: (1, batch, hidden size)
         lstm_out2, _ = self.lstm2(lstm_sentence_dropout)
-        # print(f'{lstm_out2.shape = }')
 
         # Predict the class probabilities using the linear output layer
         logits = self.output(lstm_out2)
+
+        # Shape: (1, batch)
         logits = torch.squeeze(logits, dim=0)
-        # print(f'{logits.shape = }')
 
         # If labels are provided, compute the cross-entropy loss
         if labels is not None:
