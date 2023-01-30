@@ -97,6 +97,17 @@ def print_document(test_df: pd.DataFrame,
                    y_pred: list,
                    id2label: dict,
                    doc_id: int):
+    """
+    The function then prints a table with the true and predicted class labels for each sentence in the test set.
+    If the true and predicted class labels are different, the text is colored red.
+
+      Params:
+        test_df: test dataset
+        y_test: true labels
+        predictions: labels predicted
+        id2label: mapping the label to idx
+        doc_id: doc id of the document to plot
+    """
 
     x_test = test_df.copy()
     x_test.reset_index(inplace=True)
