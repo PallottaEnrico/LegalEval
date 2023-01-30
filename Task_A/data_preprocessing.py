@@ -1,9 +1,6 @@
 import pandas as pd
 import re
 from tqdm import tqdm
-from transformers import (AutoTokenizer,
-                          BatchEncoding)
-from datasets import Dataset
 
 
 def index_in_words(text: str,
