@@ -66,12 +66,13 @@ class CustomRobertaForTokenClassification(RobertaPreTrainedModel):
         )
 
         sequence_output = outputs[0]
-        
+        sequence_output = self.dropout(sequence_output)
+         
         if self.num_LSTM:
             # Forward propagate through LSTM
             sequence_output, _ = self.lstm(sequence_output)
         
-        sequence_output = self.dropout(sequence_output)
+        # sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
         
         loss = None
