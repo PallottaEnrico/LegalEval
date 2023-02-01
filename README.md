@@ -19,15 +19,35 @@ Our work focuses on the first two tasks. For the first task we present a context
 
 ## Task A
 
-The objective of the task is to segment a given legal document by predicting the rhetorical role label for each sentence such as a preamble, fact, ratio, arguments, etc. These are referred to as Rhetorical Roles (RR).
+The objective of the task is to segment a given legal document by predicting the rhetorical role label for each sentence such as a preamble, fact, ratio, arguments, etc. These are referred to as Rhetorical Roles (RR). This segmentation is a fundamental building block for many legal AI applications like judgment summarizing, judgment outcome prediction, precedent search, etc.
 
 ### Best model architecture
 
+<div align="center">
+    <img src="./res/img/architecture_task_a.png" width=400px, height=auto>
+</div>
+
+<div align = 'center'>
+  Context aware InLegalBERT
+</div>
+
 ### Output Example
 
-<embed src="./res/img/output_task_a.pdf" type="application/pdf">
+<div align="center">
+    <img src="./res/img/output_task_a.png" width=600px, height=auto>
+</div>
 
+<div align = 'center'>
+      Example of a segmented document
+</div>
 
+### Results
+
+|  	|  	| **Validation Set** 	|  	|  	| **Test Set** 	|  	|
+|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|
+| **Models** 	| **Weighted  Precision** 	| **Weighted Recall** 	| **Micro F1** 	| **Weighted  Precision** 	| **Weighted  Recall** 	| **Micro  F1** 	|
+| Context Aware Legal-RoBERTa 	| 77.0 	| 76.0 	| 76.0 	| 79.0 	| 80.0 	| 80.0 	|
+| Context Aware InLegalBERT 	| 77.0 	| 77.0 	| 78.0 	| 81.0 	| 82.0 	| 82.0 	|
 
 ## Task B
 
@@ -35,4 +55,31 @@ The objective of the task is to extract legal named entities from court judgment
 
 ### Best model architecture
 
+<div align="center">
+    <img src="./res/img/architecture_task_b.png" width=200px, height=auto>
+</div>
+
+<div align = 'center'>
+  Transformer + BiLSTM + CRF
+</div>
+
 ### Output Example
+
+<div align="center">
+    <img src="./res/img/output_task_b.png" width=800px, height=auto>
+</div>
+
+<div align = 'center'>
+  Example of tokenization of a sentence
+</div>
+
+### Results
+
+|  	|  	| **Validation Set** 	|  	|  	| **Test Set** 	|  	|
+|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|
+| **Models** 	| **Macro  Precision** 	| **Macro Recall** 	| **Macro F1** 	| **Macro  Precision** 	| **Macro  Recall** 	| **Macro  F1** 	|
+| RoBERTa - BiLSTM - CRF 	| 81.2 	| 86.5 	| 84.1 	| 84.4 	| 89.0 	| 86.7 	|
+| XLNet - BiLSTM - CRF 	| 85.3 	| 86.8 	| 84.0 	| 85.9 	| 90.4 	| 88.1 	|
+
+## References
+- [LegalEval challenge leaderboard](https://codalab.lisn.upsaclay.fr/competitions/9558#results)
