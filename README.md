@@ -70,7 +70,7 @@ The objective of the task is to extract legal named entities from court judgment
 </div>
 
 <div align = 'center'>
-  Example of tokenization of a sentence
+  Example of Legal Named Entities detected in a sentence
 </div>
 
 ### Results
