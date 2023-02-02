@@ -17,7 +17,10 @@ The LegalEval challenge proposes three tasks, based on Indian Legal documents:
 
 Our work focuses on the first two tasks. For the first task we present a context-aware approach to enhance sentence information. With the help of this approach, the classification model utilizing InLegalBert as a transformer achieved <b>81.12%</b> Micro-F1. For the second task we present a NER approach to extract and classify entities like names of petitioner, respondent, court or statute from a given document. The model utilizing XLNet as transformer and a dependency parser on top achieved <b>87.43%</b> F1.
 
-## Task A
+## Task A 
+<a target="_blank" href="https://colab.research.google.com/github/PallottaEnrico/LegalEval/blob/main/Task_A/RR_prediction.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 The objective of the task is to segment a given legal document by predicting the rhetorical role label for each sentence such as a preamble, fact, ratio, arguments, etc. These are referred to as Rhetorical Roles (RR). This segmentation is a fundamental building block for many legal AI applications like judgment summarizing, judgment outcome prediction, precedent search, etc.
 
