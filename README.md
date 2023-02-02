@@ -18,7 +18,7 @@ The LegalEval challenge proposes three tasks, based on Indian Legal documents:
 Our work focuses on the first two tasks. For the first task we present a context-aware approach to enhance sentence information. With the help of this approach, the classification model utilizing InLegalBert as a transformer achieved <b>81.12%</b> Micro-F1. For the second task we present a NER approach to extract and classify entities like names of petitioner, respondent, court or statute from a given document. The model utilizing XLNet as transformer and a dependency parser on top achieved <b>87.43%</b> F1.
 
 ## Task A 
-<a target="_blank" href="https://colab.research.google.com/github/PallottaEnrico/LegalEval/blob/main/Task_A/RR_prediction.ipynb">
+<a target="_blank" href="https://colab.research.google.com/github/PallottaEnrico/LegalEval/blob/main/Task_A/Rhetorical_Roles_solution.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
@@ -53,6 +53,9 @@ The objective of the task is to segment a given legal document by predicting the
 | Context Aware InLegalBERT 	| 77.0 	| 77.0 	| 78.0 	| 81.0 	| 82.0 	| 82.0 	|
 
 ## Task B
+<a target="_blank" href="https://colab.research.google.com/github/PallottaEnrico/LegalEval/blob/main/Task_B/Legal_NER_solution.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 The objective of the task is to extract legal named entities from court judgment texts to effectively generate metadata information that can be exploited for many legal applications like knowledge graph creation, co-reference resolution and in general to build any query-able knowledge base that would allow faster information access.
 
