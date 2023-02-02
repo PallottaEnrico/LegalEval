@@ -84,7 +84,7 @@ The objective of the task is to extract legal named entities from court judgment
 |  	|  	| **Validation Set** 	|  	|  	| **Test Set** 	|  	|
 |:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|
 | **Models** 	| **Macro  Precision** 	| **Macro Recall** 	| **Macro F1** 	| **Macro  Precision** 	| **Macro  Recall** 	| **Macro  F1** 	|
-| RoBERTa - BiLSTM - CRF 	| 81.2 	| 86.5 	| 84.1 	| 84.4 	| 89.0 	| 86.7 	|
+| RoBERTa - BiLSTM - CRF 	| 76.0 	| 82.3 	| 79.0 	| 85.5 	| 88.4 	| 87.0 	|
 | XLNet - BiLSTM - CRF 	| 85.3 	| 86.8 	| 84.0 	| 85.9 	| 90.4 	| 88.1 	|
 
 ## References
