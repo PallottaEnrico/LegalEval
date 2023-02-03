@@ -7,7 +7,9 @@ import torch
 import numpy as np
 
 def clean_data(row):
-    
+    """
+        Removes all the multiple whitespaces and adapt the start, end indexes.
+    """
     start = row['start']
     end = row['end']
     context = row['context']
@@ -156,6 +158,10 @@ def tokenize_and_label(row : dict, tokenizer : AutoTokenizer):
   return list(zip(tokens_context, labels))
 
 class NERDataMaker:
+    """
+        This class handles the whole process of converting the raw text to list of tokens with labels in B-I-O format,
+        and then to a dataset format that will be used in the training process.
+    """
     def __init__(self, df : pd.DataFrame, tokenizer : AutoTokenizer):
         self.tokenizer = tokenizer
         self.unique_entities = []
@@ -209,8 +215,11 @@ class NERDataMaker:
         else:
             return [_process_tokens_for_one_text(i+idx.start, tee) for i, tee in enumerate(tokens_with_encoded_entities)]
 
-    def as_hf_dataset(self, window_length, sl_window, CRF = False) -> Dataset:
-
+    def as_hf_dataset(self, window_length, sl_window = True, CRF = False) -> Dataset:
+        """
+            Converts list of tokens and labels to dataset format with input_ids,
+            if sl_window = True, split examples longer than window_length in multiple windows.
+        """
         def generate_input_ids_labels(examples):
             # CRF does not allow -100 as token id, so we'll not add it.
             if CRF:
