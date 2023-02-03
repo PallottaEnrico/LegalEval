@@ -6,18 +6,21 @@ Authors:
 - [Flavio Pinzarrone](https://github.com/flaviopinzarrone)
 - [Giuseppe Tanzi](https://github.com/giuseppe-tanzi)
 
-Project work for the "Natural Language Processing" course of the Artificial Intelligence master's degree at University of Bologna. This code in this repository is a devolopment of the first two tasks of the [LegalEval challenge](https://sites.google.com/view/legaleval/home) of SemEval 2023. <br>
+Project work for the "Natural Language Processing" course of the Artificial Intelligence master's degree at University of Bologna. This code in this repository is a devolopment of the first two tasks of the [LegalEval challenge](https://sites.google.com/view/legaleval/home) of [SemEval 2023](https://semeval.github.io/SemEval2023/). <br>
 
-The LegalEval challenge proposes three tasks, based on Indial Legal documents: 
+The LegalEval challenge proposes three tasks, based on Indian Legal documents: 
 - Rhetorical Roles prediction
 - Legal Named Entity Recognition
 - Court Judgement Prediction with Explanation. 
 
 ## Introduction
 
-Our work focuses on the first two tasks. For the first task we present a context-aware approach to enhance sentence information. With the help of this approach, the classification model utilizing InLegalBert as a transformer achieved <b>81.12%</b> Micro-F1. For the second task we present a NER approach to extract and classify entities like names of petitioner, respondent, court or statute of a given document. The model utilizing XLNet as transformer and a dependency parser on top achieved <b>87.43%</b> F1.
+Our work focuses on the first two tasks. For the first task we present a context-aware approach to enhance sentence information. With the help of this approach, the classification model utilizing InLegalBert as a transformer achieved <b>81.12%</b> Micro-F1. For the second task we present a NER approach to extract and classify entities like names of petitioner, respondent, court or statute from a given document. The model utilizing XLNet as transformer and a dependency parser on top achieved <b>87.43%</b> Macro-F1.
 
-## Task A
+## Task A 
+<a target="_blank" href="https://colab.research.google.com/github/PallottaEnrico/LegalEval/blob/main/Task_A/Rhetorical_Roles_solution.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 The objective of the task is to segment a given legal document by predicting the rhetorical role label for each sentence such as a preamble, fact, ratio, arguments, etc. These are referred to as Rhetorical Roles (RR). This segmentation is a fundamental building block for many legal AI applications like judgment summarizing, judgment outcome prediction, precedent search, etc.
 
@@ -50,6 +53,9 @@ The objective of the task is to segment a given legal document by predicting the
 | Context Aware InLegalBERT 	| 77.0 	| 77.0 	| 78.0 	| 81.0 	| 82.0 	| 82.0 	|
 
 ## Task B
+<a target="_blank" href="https://colab.research.google.com/github/PallottaEnrico/LegalEval/blob/main/Task_B/Legal_NER_solution.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 The objective of the task is to extract legal named entities from court judgment texts to effectively generate metadata information that can be exploited for many legal applications like knowledge graph creation, co-reference resolution and in general to build any query-able knowledge base that would allow faster information access.
 
@@ -78,7 +84,7 @@ The objective of the task is to extract legal named entities from court judgment
 |  	|  	| **Validation Set** 	|  	|  	| **Test Set** 	|  	|
 |:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|
 | **Models** 	| **Macro  Precision** 	| **Macro Recall** 	| **Macro F1** 	| **Macro  Precision** 	| **Macro  Recall** 	| **Macro  F1** 	|
-| RoBERTa - BiLSTM - CRF 	| 81.2 	| 86.5 	| 84.1 	| 84.4 	| 89.0 	| 86.7 	|
+| RoBERTa - BiLSTM - CRF 	| 76.0 	| 82.3 	| 79.0 	| 85.5 	| 88.4 	| 87.0 	|
 | XLNet - BiLSTM - CRF 	| 85.3 	| 86.8 	| 84.0 	| 85.9 	| 90.4 	| 88.1 	|
 
 ## References
