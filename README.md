@@ -15,7 +15,7 @@ The LegalEval challenge proposes three tasks, based on Indian Legal documents:
 
 ## Introduction
 
-Our work focuses on the first two tasks. For the first task we present a context-aware approach to enhance sentence information. With the help of this approach, the classification model utilizing InLegalBert as a transformer achieved <b>81.12%</b> Micro-F1. For the second task we present a NER approach to extract and classify entities like names of petitioner, respondent, court or statute from a given document. The model utilizing XLNet as transformer and a dependency parser on top achieved <b>87.43%</b> F1.
+Our work focuses on the first two tasks. For the first task we present a context-aware approach to enhance sentence information. With the help of this approach, the classification model utilizing InLegalBert as a transformer achieved <b>81.12%</b> Micro-F1. For the second task we present a NER approach to extract and classify entities like names of petitioner, respondent, court or statute from a given document. The model utilizing XLNet as transformer and a dependency parser on top achieved <b>87.43%</b> Macro-F1.
 
 ## Task A 
 <a target="_blank" href="https://colab.research.google.com/github/PallottaEnrico/LegalEval/blob/main/Task_A/Rhetorical_Roles_solution.ipynb">
