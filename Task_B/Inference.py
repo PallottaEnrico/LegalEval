@@ -338,7 +338,7 @@ def remap_predictions(df, df_clean, predictions):
 
 
 def remap_predictions_context(context, context_clean, pred):
-     """Method to remap the indexes of the predictions on cleaned context that correspond 
+    """Method to remap the indexes of the predictions on cleaned context that correspond 
         to the original context."""
     text = [context_clean[p['start']:p['end']] for p in pred]
     start,end = [], []
